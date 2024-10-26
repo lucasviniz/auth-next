@@ -1,9 +1,39 @@
-import { auth } from "./auth"
+import NextAuth from "next-auth";
+import authConfig from "@/auth.config";
+
+import {
+  DEFAULT_LOGIN_REDIRECT,
+  DEFAULT_NO_LOGGED_REDIRECT,
+  apiAuthPrefix,
+  authRoutes,
+  publicRoutes
+} from "@/routes"
+
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
+    const { nextUrl } = req
     const isLoggedIn = !!req.auth;
-    console.log("ROUTE: " ,req.nextUrl.pathname);
-    console.log("IS LOGGEDIN: ", isLoggedIn);
+    const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+    const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+    const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+
+    if(isApiAuthRoute){
+      return;
+    }
+
+    if(isAuthRoute) {
+      if(isLoggedIn) {
+        return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+      }
+      return;
+    }
+
+    if(!isLoggedIn && !isPublicRoute) {
+      return Response.redirect(new URL(DEFAULT_NO_LOGGED_REDIRECT, nextUrl));
+    }
+
+    return;
 })
 
 export const config = {
@@ -13,4 +43,4 @@ export const config = {
       // Always run for API routes
       '/(api|trpc)(.*)',
     ],
-  }
+}
