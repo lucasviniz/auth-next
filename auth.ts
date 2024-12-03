@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import authConfig from "@/auth.config"
 import { getUserById } from "@/data/user"
 
+
 export const { 
     handlers:{ GET, POST },
     auth,
