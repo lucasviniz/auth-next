@@ -1,5 +1,4 @@
 import { db } from "@/lib/db"
-import { userAgent } from "next/server";
 
 export const getUserByEmail = async (email: string) => {
     try{
